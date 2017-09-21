@@ -1,0 +1,214 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="ur_ur5" params="prefix">
+
+    <xacro:property name="settings" value="${load_yaml('$(find ur_ur_support)/config/ur5.yaml')}"/>
+
+    <!-- links: main serial chain -->
+    <link name="${prefix}base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/base_link.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/base_link.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_1">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/link_1.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/link_1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_2">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/link_2.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/link_2.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_3">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/link_3.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/link_3.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_4">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/link_4.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/link_4.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_5">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/link_5.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/link_5.stl"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${prefix}link_6">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/visual/link_6.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://ur_ur_support/meshes/ur5/collision/link_6.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+
+    <!-- TODO: put all of this in a yaml -->
+    <xacro:property name="ur5_d1" value="0.089159" />
+    <xacro:property name="ur5_a2" value="-0.42500" />
+    <xacro:property name="ur5_a3" value="-0.39225" />
+    <xacro:property name="ur5_d4" value="0.10915" />
+    <xacro:property name="ur5_d5" value="0.09465" />
+    <xacro:property name="ur5_d6" value="0.0823" />
+
+    <!-- Arbitrary offsets for shoulder/elbow joints -->
+    <xacro:property name="shoulder_offset" value="0.13585" />  <!-- measured from model -->
+    <xacro:property name="elbow_offset" value="-0.1197" /> <!-- measured from model -->
+
+    <!-- link lengths used in model -->
+    <xacro:property name="shoulder_height" value="${ur5_d1}" />
+    <xacro:property name="upper_arm_length" value="${-ur5_a2}" />
+    <xacro:property name="forearm_length" value="${-ur5_a3}" />
+    <xacro:property name="wrist_1_length" value="${ur5_d4 - elbow_offset - shoulder_offset}" />
+    <xacro:property name="wrist_2_length" value="${ur5_d5}" />
+    <xacro:property name="wrist_3_length" value="${ur5_d6}" />
+
+
+    <!-- joints: main serial chain -->
+    <joint name="${prefix}joint_1" type="revolute">
+      <origin xyz="0 0 ${shoulder_height}" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}link_1" />
+      <axis xyz="0 0 1" />
+      <limit effort="150.0" lower="${-2.0 * pi}" upper="${2.0 * pi}" velocity="3.15" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <joint name="${prefix}joint_2" type="revolute">
+      <!-- TODO: fix up these joint origin rotations -->
+      <origin xyz="0 ${shoulder_offset} 0" rpy="0 ${pi / 2.0} 0" />
+      <parent link="${prefix}link_1" />
+      <child link="${prefix}link_2" />
+      <axis xyz="0 1 0" />
+      <limit effort="150.0" lower="${-2.0 * pi}" upper="${2.0 * pi}" velocity="3.15" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <joint name="${prefix}joint_3" type="revolute">
+      <origin xyz="0 ${elbow_offset} ${upper_arm_length}" rpy="0 0 0" />
+      <parent link="${prefix}link_2" />
+      <child link="${prefix}link_3" />
+      <axis xyz="0 1 0" />
+      <!-- limiting to 1.0 pi rad to avoid splitting planning search space (TODO: link issue) -->
+      <limit effort="150.0" lower="${-1.0 * pi}" upper="${1.0 * pi}" velocity="3.15" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <joint name="${prefix}joint_4" type="revolute">
+      <origin xyz="0 0 ${forearm_length}" rpy="0 ${pi / 2.0} 0" />
+      <parent link="${prefix}link_3"/>
+      <child link="${prefix}link_4"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="28.0" lower="${-2.0 * pi}" upper="${2.0 * pi}" velocity="3.20" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <joint name="${prefix}joint_5" type="revolute">
+      <origin xyz="0 ${wrist_1_length} 0" rpy="0 0 0" />
+      <parent link="${prefix}link_4"/>
+      <child link="${prefix}link_5"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="28.0" lower="${-2.0 * pi}" upper="${2.0 * pi}" velocity="3.20" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+    <joint name="${prefix}joint_6" type="revolute">
+      <origin xyz="0 0 ${wrist_2_length}" rpy="0 0 0" />
+      <parent link="${prefix}link_5"/>
+      <child link="${prefix}link_6"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="28.0" lower="${-2.0 * pi}" upper="${2.0 * pi}" velocity="3.20" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+    <!-- ROS-Industrial 'base' frame: base_link to UR Base feature transform -->
+    <link name="${prefix}base" />
+    <joint name="${prefix}base_link-base" type="fixed">
+      <!-- NOTE: this rotation is only needed as long as base_link itself is
+                 not corrected wrt the real robot (ie: rotated over 180
+                 degrees)
+      -->
+      <origin xyz="0 0 0" rpy="0 0 ${-pi}"/>
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}base"/>
+    </joint>
+
+    <!-- ROS-Industrial 'flange' frame: attachment point for EEF models -->
+    <!-- TODO: fix this: what is that weird rotation there? -->
+    <!-- TODO: this is currently not correct, frame does not follow REP-103 -->
+    <!-- stole origin from ee_link -->
+    <link name="${prefix}flange" />
+    <joint name="${prefix}link_6-flange" type="fixed">
+      <origin xyz="0 ${wrist_3_length} 0" rpy="0 0 ${pi/2.0}" />
+      <parent link="${prefix}link_6" />
+      <child link="${prefix}flange" />
+    </joint>
+
+    <!-- ROS-Industrial 'tool0' frame: all-zeros tool frame -->
+    <!-- TODO: fix this: what is that weird rotation there? -->
+    <!-- stole origin from tool0 -->
+    <link name="${prefix}tool0" />
+    <joint name="${prefix}flange-tool0" type="fixed">
+      <origin xyz="0 ${wrist_3_length} 0" rpy="${pi/-2.0} 0 0"/>
+      <parent link="${prefix}link_6" />
+      <child link="${prefix}tool0" />
+    </joint>
+  </xacro:macro>
+</robot>
